@@ -1,59 +1,86 @@
-import { Github } from 'lucide-react';
-import { Button } from './components/Button';
-import { Card } from './components/Card';
+import { useState } from "react";
+import { Card } from "./components/Card";
+import { Button } from "./components/Button";
+import { BrokenMemoExample } from "./components/examples/BrokenMemoExample";
+import { EffectiveMemoExample } from "./components/examples/EffectiveMemoExample";
+import { ComponentCompositionExample } from "./components/examples/ComponentCompositionExample";
+import { LatestRefExample } from "./components/examples/LatestRefExample";
+import { ChildrenBreakMemoExample } from "./components/examples/ChildrenBreakMemoExample";
 
 function App() {
+  const [activeExample, setActiveExample] = useState<string>("broken");
+
+  const examples = [
+    { id: "broken", title: "Broken Memoization", component: BrokenMemoExample },
+    {
+      id: "effective",
+      title: "Effective Memoization",
+      component: EffectiveMemoExample,
+    },
+    {
+      id: "composition",
+      title: "Component Composition",
+      component: ComponentCompositionExample,
+    },
+    {
+      id: "latest-ref",
+      title: "Latest Ref Pattern",
+      component: LatestRefExample,
+    },
+    {
+      id: "children",
+      title: "Children Break Memo",
+      component: ChildrenBreakMemoExample,
+    },
+  ];
+
+  const ActiveComponent =
+    examples.find((ex) => ex.id === activeExample)?.component ||
+    BrokenMemoExample;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <main className="container mx-auto px-4 py-16">
-        <div className="max-w-3xl mx-auto space-y-8">
+      <main className="container mx-auto px-4 py-8">
+        <div className="max-w-6xl mx-auto space-y-8">
           <div className="text-center space-y-4">
             <h1 className="text-4xl font-bold text-gray-900 sm:text-5xl">
-              Modern React Template
+              useMemo Examples
             </h1>
             <p className="text-lg text-gray-600">
-              A production-ready template with React, TypeScript, Tailwind CSS, and Vitest
+              Demonstrating when memoization helps, when it hurts, and the
+              "all-or-nothing" principle
             </p>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-2">
-            <Card title="Features">
-              <ul className="space-y-2 text-gray-600">
-                <li>✓ React 18 with TypeScript</li>
-                <li>✓ Vite for fast development</li>
-                <li>✓ Tailwind CSS for styling</li>
-                <li>✓ Vitest for testing</li>
-                <li>✓ ESLint configuration</li>
-                <li>✓ Pre-built components</li>
-              </ul>
-            </Card>
-
-            <Card title="Getting Started">
-              <div className="space-y-4">
-                <p className="text-gray-600">
-                  Edit <code className="text-sm font-mono bg-gray-100 px-1 py-0.5 rounded">src/App.tsx</code> and save to test HMR updates.
-                </p>
-                <div className="flex space-x-4">
-                  <Button>
-                    Primary Button
-                  </Button>
-                  <Button variant="secondary">
-                    Secondary
-                  </Button>
-                </div>
-              </div>
-            </Card>
+          <div className="flex flex-wrap gap-2 justify-center">
+            {examples.map((example) => (
+              <Button
+                key={example.id}
+                variant={activeExample === example.id ? "primary" : "secondary"}
+                onClick={() => setActiveExample(example.id)}
+                size="sm"
+              >
+                {example.title}
+              </Button>
+            ))}
           </div>
 
-          <div className="flex justify-center">
+          <Card
+            title={
+              examples.find((ex) => ex.id === activeExample)?.title || "Example"
+            }
+          >
+            <ActiveComponent />
+          </Card>
+
+          <div className="text-center">
             <a
-              href="https://github.com"
+              href="https://github.com/slackermorris/use-memo"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center space-x-2 text-gray-600 hover:text-gray-900"
             >
-              <Github className="w-5 h-5" />
-              <span>View on GitHub</span>
+              <span>View Source on GitHub</span>
             </a>
           </div>
         </div>
