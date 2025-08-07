@@ -1,18 +1,22 @@
 {
-  "name": "scratchpad",
-  "description": "A modern frontend template (react, typescript, vite, tailwindcss)",
+  "name": "use-memo",
+  "homepage": "https://slackermorris.github.io/use-memo",
+  "description": "I want to illustrate the limitations of memoisation through useMemo.",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "start": "vite",
-    "build": "tsc && vite build",
+    "build": "tsc && vite build --outDir build",
     "test": "vitest",
     "coverage": "vitest run --coverage",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "dependencies": {
+    "gh-pages": "^6.3.0",
     "lucide-react": "^0.344.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
