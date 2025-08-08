@@ -305,6 +305,7 @@ function ShoppingApp() {
 
   return (
     <>
+      <h3>🛒 Click & Collect Shopping Application</h3>
       <ShoppingLocationSelector
         location={location}
         setLocation={setLocation}
@@ -447,7 +448,7 @@ export function BrokenMemoExample() {
 
   const products = PRODUCTS;
 
-  const renderRight = () => {
+  const renderProductList = () => {
     switch (step) {
       case "baseline":
         return <Demo_Baseline products={products} />;
@@ -485,6 +486,7 @@ export function BrokenMemoExample() {
         </div>
 
         <div className="space-y-4 rounded-lg p-1 ring ring-gray-600/20 ring-inset">
+          <StepExplanation step={step} setStep={setStep} />
           <RenderTracker name={`ShoppingApp`}>
             <div className="space-y-2 w-full bg-gray-100/80 ">
               <div className="flex items-center justify-between w-full p-4 bg-gray-200">
@@ -499,7 +501,7 @@ export function BrokenMemoExample() {
                   setLocation={setLocation}
                 />
 
-                {renderRight()}
+                {renderProductList()}
               </div>
             </div>
           </RenderTracker>
@@ -507,6 +509,39 @@ export function BrokenMemoExample() {
       </div>
     </div>
   );
+}
+
+function StepExplanation({
+  step,
+  setStep,
+}: {
+  step: string;
+  setStep: (step: string) => void;
+}) {
+  switch (step) {
+    case "baseline":
+      return (
+        <div className="space-y-2 p-4 border rounded-lg bg-purple-100 shadow-lg shadow-purple-300/20 ring-2 ring-purple-300">
+          <h3 className="font-semibold">Step 1 – Baseline (no memo)</h3>
+          <p className="text-xs text-gray-600">
+            You'll notice every time the pick-up location changes, the
+            ProductList re-renders.
+          </p>
+          <p className="text-xs text-gray-600">
+            When the pick-up location changes, the products array is recreated,
+            so ProductList sees a new products prop and re-renders. Surely,
+            memoising products would prevent those unnecessary re-renders.
+          </p>
+          <p className="text-xs text-gray-600">
+            <strong>Solution:</strong> Let's memoise the products prop.
+          </p>
+          <Button size="sm" onClick={() => setStep("useCallbackOnly")}>
+            Next
+          </Button>
+        </div>
+      );
+  }
+  return <div></div>;
 }
 
 function ShoppingLocationSelector({
