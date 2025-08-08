@@ -371,30 +371,31 @@ function ShoppingApp() {
     </>
   );
 };
-  
-const PRODUCTS = [
-  {
-    id: 1,
-    name: "Product 1",
-    price: 100,
-    category: "electronics",
-    inStock: true,
-  },
-  {
-    id: 2,
-    name: "Product 2",
-    price: 200,
-    category: "clothing",
-    inStock: false,
-  },
-  {
-    id: 3,
-    name: "Product 3",
-    price: 300,
-    category: "books",
-    inStock: true,
-  },
-];
+`;
+
+const CODE_MEMOISE_COMPONENT = `
+const MemoisedProductList = React.memo(ProductList);
+
+function ShoppingApp() {
+  const [location, setLocation] = useState<
+    "island_bay" | "wellington_central" | "wellington_airport" | "wellington_west"
+  >("island_bay");
+
+  const products = useMemo(() => PRODUCTS, []);
+
+  return (
+    <>
+      <h3>🛒 Click & Collect Shopping Application</h3>
+      <ShoppingLocationSelector
+        location={location}
+        setLocation={setLocation}
+      />
+      <MemoisedProductList
+        products={products}
+      />
+    </>
+  );
+};
 `;
 
 const CODE_CALLBACK_ONLY = `// useCallback only (doesn't help by itself)
@@ -493,7 +494,9 @@ const PRODUCTS = [
 ];
 
 export function BrokenMemoExample() {
-  const [step, setStep] = useState<"baseline" | "memoiseProp">("baseline");
+  const [step, setStep] = useState<
+    "baseline" | "memoiseProp" | "memoiseComponent"
+  >("baseline");
 
   const codeForStep = () => {
     switch (step) {
@@ -503,6 +506,11 @@ export function BrokenMemoExample() {
         return {
           title: "Step 2 – Memoise the products prop",
           code: CODE_MEMOISE_PROP,
+        };
+      case "memoiseComponent":
+        return {
+          title: "Step 3 – Memoise the component",
+          code: CODE_MEMOISE_COMPONENT,
         };
     }
   };
@@ -517,6 +525,7 @@ export function BrokenMemoExample() {
             {[
               { id: "baseline", label: "Baseline" },
               { id: "memoiseProp", label: "Memoise the products prop" },
+              { id: "memoiseComponent", label: "Memoise the component" },
             ].map((s) => (
               <Button
                 key={s.id}
@@ -543,8 +552,8 @@ function ShoppingAppRenderer({
   step,
   setStep,
 }: {
-  step: "baseline" | "memoiseProp";
-  setStep: (step: "baseline" | "memoiseProp") => void;
+  step: "baseline" | "memoiseProp" | "memoiseComponent";
+  setStep: (step: "baseline" | "memoiseProp" | "memoiseComponent") => void;
 }) {
   switch (step) {
     case "baseline":
@@ -559,6 +568,13 @@ function ShoppingAppRenderer({
         <div className="space-y-4 rounded-lg p-1 ring ring-gray-600/20 ring-inset">
           <StepExplanation step={step} setStep={setStep} />
           <ShoppingAppMemoProp />
+        </div>
+      );
+    case "memoiseComponent":
+      return (
+        <div className="space-y-4 rounded-lg p-1 ring ring-gray-600/20 ring-inset">
+          <StepExplanation step={step} setStep={setStep} />
+          <ShoppingAppMemoComponent />
         </div>
       );
   }
@@ -626,12 +642,45 @@ function ShoppingAppMemoProp() {
   );
 }
 
+const MemoisedProductList = memo(ProductList);
+
+function ShoppingAppMemoComponent() {
+  const [location, setLocation] = useState<
+    | "island_bay"
+    | "wellington_central"
+    | "wellington_airport"
+    | "wellington_west"
+  >("island_bay");
+
+  const products = useMemo(() => PRODUCTS, []);
+  return (
+    <RenderTracker name={`ShoppingApp`}>
+      <div className="space-y-2 w-full bg-gray-100/80 ">
+        <div className="flex items-center justify-between w-full p-4 bg-gray-200">
+          <h3 className="text-lg font-semibold">
+            🛒 Click & Collect Shopping Application
+          </h3>
+        </div>
+
+        <div className="space-y-2 p-4">
+          <ShoppingLocationSelector
+            location={location}
+            setLocation={setLocation}
+          />
+
+          <MemoisedProductList products={products} />
+        </div>
+      </div>
+    </RenderTracker>
+  );
+}
+
 function StepExplanation({
   step,
   setStep,
 }: {
   step: string;
-  setStep: (step: "baseline" | "memoiseProp") => void;
+  setStep: (step: "baseline" | "memoiseProp" | "memoiseComponent") => void;
 }) {
   switch (step) {
     case "baseline":
@@ -659,6 +708,36 @@ function StepExplanation({
       return (
         <div className="space-y-2 p-4 border rounded-lg bg-purple-100 shadow-lg shadow-purple-300/20 ring-2 ring-purple-300">
           <h3 className="font-semibold">Step 2 – Memoise the products prop</h3>
+          <p className="text-xs text-gray-600">
+            You'll notice that the ProductList still re-renders despite us
+            memoising the one prop, products, that it depends on.
+          </p>
+          <p className="text-xs text-gray-600">
+            Why isn't our memoisation working? Well, in order for the
+            memoisation to be effective we have to memoise the component as
+            well.
+          </p>
+          <p className="text-xs text-gray-600">
+            <strong>Solution:</strong> Let's use React.memo to memoise the
+            ProductList component.
+          </p>
+          <Button size="sm" onClick={() => setStep("memoiseComponent")}>
+            Next
+          </Button>
+        </div>
+      );
+    case "memoiseComponent":
+      return (
+        <div className="space-y-2 p-4 border rounded-lg bg-purple-100 shadow-lg shadow-purple-300/20 ring-2 ring-purple-300">
+          <h3 className="font-semibold">Step 3 – Memoise the component</h3>
+          <p className="text-xs text-gray-600">
+            Well, would you look at that! You'll notice that the ProductList no
+            longer re-renders when the pick-up location changes.
+          </p>
+          <p className="text-xs text-gray-600">
+            Finally our memoisation is working. You will notice that we still
+            memoise the products prop passed to the ProductList component.
+          </p>
         </div>
       );
   }
