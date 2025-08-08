@@ -4,12 +4,14 @@ interface RenderTrackerProps {
   name: string;
   children: React.ReactNode;
   className?: string;
+  flashClassName?: string;
 }
 
 export function RenderTracker({
   name,
   children,
   className = "",
+  flashClassName = "",
 }: RenderTrackerProps) {
   const [renderCount, setRenderCount] = useState(0);
   const [isFlashing, setIsFlashing] = useState(false);
@@ -40,7 +42,7 @@ export function RenderTracker({
         relative transition-all duration-500 rounded-lg
         ${
           isFlashing
-            ? "bg-yellow-200 shadow-lg shadow-yellow-500/50 ring-2 ring-yellow-400"
+            ? `bg-yellow-200 shadow-lg shadow-yellow-500/50 ring-2 ring-yellow-400 ${flashClassName}`
             : ""
         }
         ${className}

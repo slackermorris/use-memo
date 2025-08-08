@@ -109,7 +109,7 @@ const MemoizedProductList = memo(function MemoizedProductList({
 
 function Demo_Baseline({ products }: { products: Product[] }) {
   return (
-    <RenderTracker name="ShoppingApp (Baseline)" className="space-y-4">
+    <RenderTracker name="ShoppingApp (Baseline)">
       <ProductList products={products} />
     </RenderTracker>
   );
@@ -291,27 +291,49 @@ function Demo_ContextFixed({
 
 const CODE_BASELINE = `
 function ShoppingApp() {
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [cartCount, setCartCount] = useState(0);
-  const [shoppingVenue, setShoppingVenue] = useState('island bay');
+  const [location, setLocation] = useState<
+    "island_bay" | "wellington_central" | "wellington_airport" | "wellington_west"
+  >("island_bay");
 
-  // New array on every render
-  const products = PRODUCTS_DB.filter(p => 
-    selectedCategory === 'all' || p.category === selectedCategory
-  );
+  const products = PRODUCTS;
 
   return (
     <>
-      <ProductList 
-        products={products}
-        searchTerm={selectedCategory}
-        onAddToCart={() => setCartCount(c => c + 1)}
+      <ShoppingLocationSelector
+        location={location}
+        setLocation={setLocation}
       />
-
-      <span>Cart: {cartCount}</span>
+      <ProductList
+        products={products}
+      />
     </>
   );
-}`;
+};
+  
+const PRODUCTS = [
+  {
+    id: 1,
+    name: "Product 1",
+    price: 100,
+    category: "electronics",
+    inStock: true,
+  },
+  {
+    id: 2,
+    name: "Product 2",
+    price: 200,
+    category: "clothing",
+    inStock: false,
+  },
+  {
+    id: 3,
+    name: "Product 3",
+    price: 300,
+    category: "books",
+    inStock: true,
+  },
+];
+`;
 
 const CODE_CALLBACK_ONLY = `// useCallback only (doesn't help by itself)
 function ShoppingApp() {
@@ -384,6 +406,30 @@ function ShoppingApp() {
   );
 }`;
 
+const PRODUCTS = [
+  {
+    id: 1,
+    name: "Product 1",
+    price: 100,
+    category: "electronics",
+    inStock: true,
+  },
+  {
+    id: 2,
+    name: "Product 2",
+    price: 200,
+    category: "clothing",
+    inStock: false,
+  },
+  {
+    id: 3,
+    name: "Product 3",
+    price: 300,
+    category: "books",
+    inStock: true,
+  },
+];
+
 export function BrokenMemoExample() {
   const [step, setStep] = useState<"baseline">("baseline");
   const [location, setLocation] = useState<
@@ -393,12 +439,12 @@ export function BrokenMemoExample() {
     | "wellington_west"
   >("island_bay");
 
-  const productsUnstable = PRODUCTS_DB.filter((p) => p.inStock);
+  const products = PRODUCTS;
 
   const renderRight = () => {
     switch (step) {
       case "baseline":
-        return <Demo_Baseline products={productsUnstable} />;
+        return <Demo_Baseline products={products} />;
     }
   };
 
@@ -433,51 +479,65 @@ export function BrokenMemoExample() {
         </div>
 
         <div className="space-y-4 rounded-lg p-1 ring ring-gray-600/20 ring-inset">
-          <div className="flex items-center justify-between">
-            <RenderTracker
-              name={`ShoppingApp`}
-              className="p-4 border rounded-lg"
-            >
-              <div className="space-y-2 px-4 py-2 bg-gray-100/70 w-full">
-                <div className="flex items-center justify-between  w-full bg-gray-100/80 p-4 border rounded-lg">
-                  <h3 className="text-lg font-semibold">
-                    🛒 Click & Collect Shopping Application
-                  </h3>
-                </div>
-                <RenderTracker
-                  name={`Location`}
-                  className="p-4 border rounded-lg"
-                >
-                  <div className="space-y-2 px-4 py-2 bg-gray-100/80 p-4 border rounded-lg">
-                    <label className="text-sm text-gray-600">
-                      Select a pick up location:
-                      <select
-                        className="w-full bg-white border border-gray-300 rounded-md p-2 text-sm"
-                        value={location}
-                        onChange={(e) =>
-                          setLocation(e.target.value as typeof location)
-                        }
-                      >
-                        <option value="island_bay">Island Bay</option>
-                        <option value="wellington_central">
-                          Wellington Central
-                        </option>
-                        <option value="wellington_airport">
-                          Wellington Airport
-                        </option>
-                        <option value="wellington_west">Wellington West</option>
-                      </select>
-                    </label>
-                  </div>
-                </RenderTracker>
-                {renderRight()}
+          <RenderTracker name={`ShoppingApp`}>
+            <div className="space-y-2 w-full">
+              <div className="flex items-center justify-between  w-full bg-gray-100/80 p-4 border rounded-lg">
+                <h3 className="text-lg font-semibold">
+                  🛒 Click & Collect Shopping Application
+                </h3>
               </div>
-            </RenderTracker>
-          </div>
+
+              <ShoppingLocationSelector
+                location={location}
+                setLocation={setLocation}
+              />
+
+              {renderRight()}
+            </div>
+          </RenderTracker>
         </div>
       </div>
     </div>
   );
 }
 
-// each time the child renders
+function ShoppingLocationSelector({
+  location,
+  setLocation,
+}: {
+  location:
+    | "island_bay"
+    | "wellington_central"
+    | "wellington_airport"
+    | "wellington_west";
+  setLocation: (
+    location:
+      | "island_bay"
+      | "wellington_central"
+      | "wellington_airport"
+      | "wellington_west"
+  ) => void;
+}) {
+  return (
+    <RenderTracker
+      name={`Location`}
+      flashClassName="bg-orange-200 shadow-lg shadow-orange-500/50 ring-2 ring-orange-400"
+    >
+      <div className="space-y-2 px-4 py-2 bg-gray-100/80 p-4 border rounded-lg">
+        <label className="text-sm text-gray-600">
+          Select a pick up location:
+          <select
+            className="w-full bg-white border border-gray-300 rounded-md p-2 text-sm"
+            value={location}
+            onChange={(e) => setLocation(e.target.value as typeof location)}
+          >
+            <option value="island_bay">Island Bay</option>
+            <option value="wellington_central">Wellington Central</option>
+            <option value="wellington_airport">Wellington Airport</option>
+            <option value="wellington_west">Wellington West</option>
+          </select>
+        </label>
+      </div>
+    </RenderTracker>
+  );
+}
