@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { Button } from "../Button";
+import { CodeBlock } from "../CodeBlock";
 
 interface Hotkey {
   key: string;
@@ -187,6 +188,50 @@ export function LatestRefExample() {
           </ul>
         </div>
       </div>
+
+      <CodeBlock
+        code={`// ❌ BAD: Dependencies change frequently
+function useHotkeys(hotkeys) {
+  const onKeyDown = useCallback((event) => {
+    const hotkey = hotkeys.find(h => h.key === event.key);
+    if (hotkey) handleHotkey(hotkey);
+  }, [hotkeys]); // Creates new callback every time hotkeys change
+  
+  useEffect(() => {
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [onKeyDown]); // Effect re-runs every time
+}
+
+// ❌ BAD: Stale closure
+function useHotkeys(hotkeys) {
+  const onKeyDown = useCallback((event) => {
+    const hotkey = hotkeys.find(h => h.key === event.key);
+    if (hotkey) handleHotkey(hotkey);
+  }, []); // Missing dependency - only sees initial hotkeys!
+}
+
+// ✅ GOOD: Latest ref pattern
+function useHotkeys(hotkeys) {
+  const hotkeysRef = useRef(hotkeys);
+  
+  useEffect(() => {
+    hotkeysRef.current = hotkeys; // Keep ref current
+  });
+  
+  const onKeyDown = useCallback((event) => {
+    const hotkey = hotkeysRef.current.find(h => h.key === event.key);
+    if (hotkey) handleHotkey(hotkey);
+  }, []); // Stable callback that always sees latest hotkeys
+  
+  useEffect(() => {
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [onKeyDown]); // Only runs once
+}`}
+        title="Latest Ref Pattern"
+        className="mt-6"
+      />
     </div>
   );
 }
