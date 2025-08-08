@@ -30,7 +30,7 @@ export function RenderTracker({
       mountedRef.current = true;
       setRenderCount(1);
     }
-  }, []);
+  }, [children]);
 
   console.log(`🔄 ${name} rendered (count: ${renderCount})`);
 

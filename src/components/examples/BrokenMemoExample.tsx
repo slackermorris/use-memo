@@ -107,17 +107,10 @@ const MemoizedProductList = memo(function MemoizedProductList({
   );
 });
 
-// Demo variants to reflect the progression
-// 1) Baseline: everything inline, no memoization
 function Demo_Baseline({ products }: { products: Product[] }) {
-  const [cart, setCart] = useState<Product[]>([]);
   return (
     <RenderTracker name="ShoppingApp (Baseline)" className="space-y-4">
-      <ProductList
-        products={products}
-        onAddToCart={(p) => setCart((prev) => [...prev, p])}
-      />
-      <p className="text-xs text-blue-600">Cart items: {cart.length}</p>
+      <ProductList products={products} />
     </RenderTracker>
   );
 }
@@ -441,38 +434,50 @@ export function BrokenMemoExample() {
 
         <div className="space-y-4 rounded-lg p-1 ring ring-gray-600/20 ring-inset">
           <div className="flex items-center justify-between">
-            <div className="space-y-2 px-4 py-2 bg-gray-100/70 w-full">
-              <div className="flex items-center justify-between  w-full bg-gray-100/80 p-4 border rounded-lg">
-                <h3 className="text-lg font-semibold">
-                  🛒 Click & Collect Shopping Application
-                </h3>
+            <RenderTracker
+              name={`ShoppingApp`}
+              className="p-4 border rounded-lg"
+            >
+              <div className="space-y-2 px-4 py-2 bg-gray-100/70 w-full">
+                <div className="flex items-center justify-between  w-full bg-gray-100/80 p-4 border rounded-lg">
+                  <h3 className="text-lg font-semibold">
+                    🛒 Click & Collect Shopping Application
+                  </h3>
+                </div>
+                <RenderTracker
+                  name={`Location`}
+                  className="p-4 border rounded-lg"
+                >
+                  <div className="space-y-2 px-4 py-2 bg-gray-100/80 p-4 border rounded-lg">
+                    <label className="text-sm text-gray-600">
+                      Select a pick up location:
+                      <select
+                        className="w-full bg-white border border-gray-300 rounded-md p-2 text-sm"
+                        value={location}
+                        onChange={(e) =>
+                          setLocation(e.target.value as typeof location)
+                        }
+                      >
+                        <option value="island_bay">Island Bay</option>
+                        <option value="wellington_central">
+                          Wellington Central
+                        </option>
+                        <option value="wellington_airport">
+                          Wellington Airport
+                        </option>
+                        <option value="wellington_west">Wellington West</option>
+                      </select>
+                    </label>
+                  </div>
+                </RenderTracker>
+                {renderRight()}
               </div>
-              <div className="space-y-2 px-4 py-2 bg-gray-100/80 p-4 border rounded-lg">
-                <label className="text-sm text-gray-600">
-                  Select a pick up location:
-                  <select
-                    className="w-full bg-white border border-gray-300 rounded-md p-2 text-sm"
-                    value={location}
-                    onChange={(e) =>
-                      setLocation(e.target.value as typeof location)
-                    }
-                  >
-                    <option value="island_bay">Island Bay</option>
-                    <option value="wellington_central">
-                      Wellington Central
-                    </option>
-                    <option value="wellington_airport">
-                      Wellington Airport
-                    </option>
-                    <option value="wellington_west">Wellington West</option>
-                  </select>
-                </label>
-              </div>
-              {renderRight()}
-            </div>
+            </RenderTracker>
           </div>
         </div>
       </div>
     </div>
   );
 }
+
+// each time the child renders
