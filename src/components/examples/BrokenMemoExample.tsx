@@ -32,20 +32,26 @@ const useTheme = () => useContext(ThemeContext);
 // Child list (not memoized) – performs expensive filtering every render
 function ProductList({ products }: { products: Product[] }) {
   return (
-    <RenderTracker name={`ProductList`} className="p-4 border rounded-lg">
-      <h4 className="font-semibold mb-2">Product List</h4>
-      <div className="space-y-2">
-        <div className="overflow-y-auto space-y-1">
-          {products.slice(0, 5).map((product) => (
-            <div
-              key={product.id}
-              className="flex items-center justify-between text-xs h-4 bg-gray-100 rounded-lg p-4 border border-gray-200"
-            >
-              <span>
-                {product.name} - ${product.price}
-              </span>
-            </div>
-          ))}
+    <RenderTracker
+      name={`ProductList`}
+      className="bg-white"
+      flashClassName="bg-blue-200 shadow-lg shadow-blue-500/50 ring-2 ring-blue-400"
+    >
+      <div className="p-4 border rounded-lg">
+        <h4 className="font-semibold mb-2">Shopping List</h4>
+        <div className="space-y-2">
+          <div className="overflow-y-auto space-y-1">
+            {products.slice(0, 5).map((product) => (
+              <div
+                key={product.id}
+                className="flex items-center justify-between text-xs h-4 bg-gray-100/80 rounded-lg p-4 border border-gray-200"
+              >
+                <span>
+                  {product.name} - ${product.price}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </RenderTracker>
@@ -130,7 +136,7 @@ function Demo_UseCallbackOnly({
   );
   return (
     <RenderTracker name="ShoppingApp (useCallback only)" className="space-y-4">
-      <div className="p-4 border rounded-lg">
+      <div className="p-4 border rounded-lg bg-white">
         <h3 className="font-semibold">useCallback only</h3>
         <p className="text-xs text-gray-600">
           Doesn't help because child isn't memoized and parent still re-renders.
@@ -480,19 +486,21 @@ export function BrokenMemoExample() {
 
         <div className="space-y-4 rounded-lg p-1 ring ring-gray-600/20 ring-inset">
           <RenderTracker name={`ShoppingApp`}>
-            <div className="space-y-2 w-full">
-              <div className="flex items-center justify-between  w-full bg-gray-100/80 p-4 border rounded-lg">
+            <div className="space-y-2 w-full bg-gray-100/80 ">
+              <div className="flex items-center justify-between w-full p-4 bg-gray-200">
                 <h3 className="text-lg font-semibold">
                   🛒 Click & Collect Shopping Application
                 </h3>
               </div>
 
-              <ShoppingLocationSelector
-                location={location}
-                setLocation={setLocation}
-              />
+              <div className="space-y-2 p-4">
+                <ShoppingLocationSelector
+                  location={location}
+                  setLocation={setLocation}
+                />
 
-              {renderRight()}
+                {renderRight()}
+              </div>
             </div>
           </RenderTracker>
         </div>
@@ -521,9 +529,10 @@ function ShoppingLocationSelector({
   return (
     <RenderTracker
       name={`Location`}
+      className="bg-white"
       flashClassName="bg-orange-200 shadow-lg shadow-orange-500/50 ring-2 ring-orange-400"
     >
-      <div className="space-y-2 px-4 py-2 bg-gray-100/80 p-4 border rounded-lg">
+      <div className="space-y-2 p-4 border rounded-lg">
         <label className="text-sm text-gray-600">
           Select a pick up location:
           <select
