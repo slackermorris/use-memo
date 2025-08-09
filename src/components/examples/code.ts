@@ -66,7 +66,7 @@ function ShoppingApp() {
 const CODE_MEMOISE_PROP_WITH_DEPENDENCY = `
 const MemoisedProductList = React.memo(ProductList);
 
-function ShoppingApp({ suggestedProducts }: { suggestedProducts: (typeof PRODUCTS)[number] }) {
+function ShoppingApp({ suggestedProducts }: { suggestedProducts: Array<Products> }) {
   const [location, setLocation] = useState<LocationType>("island_bay");
 
   const products = useMemo(() => {
