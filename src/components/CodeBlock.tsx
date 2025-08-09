@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { codeToHtml } from "shiki";
+import "./CodeBlock.css";
 
 interface CodeBlockProps {
   code: string;
@@ -49,7 +50,7 @@ export function CodeBlock({
   }
 
   return (
-    <div className={`bg-gray-50 rounded-lg overflow-hidden ${className}`}>
+    <div className={`bg-gray-50 rounded-lg ${className}`}>
       {title && (
         <div className="bg-gray-100 px-4 py-2 border-b border-gray-200">
           <h4 className="font-mono text-sm font-medium text-gray-700">
@@ -58,7 +59,7 @@ export function CodeBlock({
         </div>
       )}
       <div
-        className="overflow-x-auto text-sm"
+        className="text-sm overflow-x-scroll"
         dangerouslySetInnerHTML={{ __html: html }}
       />
     </div>

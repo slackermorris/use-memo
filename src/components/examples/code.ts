@@ -1,5 +1,4 @@
-const CODE_BASELINE = `
-function ShoppingApp() {
+const CODE_BASELINE = `function ShoppingApp() {
   const [location, setLocation] = useState<LocationType>("island_bay");
 
   const products = PRODUCTS;
