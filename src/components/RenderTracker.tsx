@@ -34,8 +34,6 @@ export function RenderTracker({
     }
   }, [children]);
 
-  console.log(`🔄 ${name} rendered (count: ${renderCount})`);
-
   return (
     <div
       className={`

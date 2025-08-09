@@ -153,27 +153,82 @@ function ShoppingAppRenderer({
   step: StepType;
   setStep: (step: StepType) => void;
 }) {
+  const [hasChangedLocation, setHasChangedLocation] = useState<{
+    [key in StepType]: boolean;
+  }>({
+    baseline: false,
+    memoiseProp: false,
+    memoiseComponent: false,
+    memoisePropWithDependency: false,
+  });
+
+  const handleStepChange = (step: StepType) => {
+    setStep(step);
+  };
+
   return (
     <div className="space-y-4 rounded-lg p-1 ring ring-gray-600/20 ring-inset">
-      <StepExplanation step={step} setStep={setStep} />
+      <StepExplanation
+        step={step}
+        setStep={handleStepChange}
+        hasChangedLocation={hasChangedLocation[step]}
+      />
 
       {step === "baseline" ? (
-        <ShoppingAppNoMemo />
+        <ShoppingAppNoMemo
+          setHasChangedLocation={(hasChangedLocation) =>
+            setHasChangedLocation((prev) => ({
+              ...prev,
+              baseline: hasChangedLocation,
+            }))
+          }
+        />
       ) : step === "memoiseProp" ? (
-        <ShoppingAppMemoProp />
+        <ShoppingAppMemoProp
+          setHasChangedLocation={(hasChangedLocation) =>
+            setHasChangedLocation((prev) => ({
+              ...prev,
+              memoiseProp: hasChangedLocation,
+            }))
+          }
+        />
       ) : step === "memoiseComponent" ? (
-        <ShoppingAppMemoComponent />
+        <ShoppingAppMemoComponent
+          setHasChangedLocation={(hasChangedLocation) =>
+            setHasChangedLocation((prev) => ({
+              ...prev,
+              memoiseComponent: hasChangedLocation,
+            }))
+          }
+        />
       ) : step === "memoisePropWithDependency" ? (
-        <ShoppingAppMemoPropWithDependency />
+        <ShoppingAppMemoPropWithDependency
+          setHasChangedLocation={(hasChangedLocation) =>
+            setHasChangedLocation((prev) => ({
+              ...prev,
+              memoisePropWithDependency: hasChangedLocation,
+            }))
+          }
+        />
       ) : null}
     </div>
   );
 }
 
-function ShoppingAppNoMemo() {
+function ShoppingAppNoMemo({
+  setHasChangedLocation,
+}: {
+  setHasChangedLocation: (hasChangedLocation: boolean) => void;
+}) {
   const [location, setLocation] = useState<LocationType>("island_bay");
 
   const products = PRODUCTS;
+
+  const handleLocationChange = (location: LocationType) => {
+    setLocation(location);
+    setHasChangedLocation(true);
+  };
+
   return (
     <RenderTracker name={`ShoppingApp`}>
       <div className="space-y-2 w-full bg-gray-100/80 ">
@@ -186,7 +241,7 @@ function ShoppingAppNoMemo() {
         <div className="space-y-2 p-4">
           <ShoppingLocationSelector
             location={location}
-            setLocation={setLocation}
+            setLocation={handleLocationChange}
           />
 
           <ProductList products={products} />
@@ -196,10 +251,20 @@ function ShoppingAppNoMemo() {
   );
 }
 
-function ShoppingAppMemoProp() {
+function ShoppingAppMemoProp({
+  setHasChangedLocation,
+}: {
+  setHasChangedLocation: (hasChangedLocation: boolean) => void;
+}) {
   const [location, setLocation] = useState<LocationType>("island_bay");
 
   const products = useMemo(() => PRODUCTS, []);
+
+  const handleLocationChange = (location: LocationType) => {
+    setLocation(location);
+    setHasChangedLocation(true);
+  };
+
   return (
     <RenderTracker name={`ShoppingApp`}>
       <div className="space-y-2 w-full bg-gray-100/80 ">
@@ -212,7 +277,7 @@ function ShoppingAppMemoProp() {
         <div className="space-y-2 p-4">
           <ShoppingLocationSelector
             location={location}
-            setLocation={setLocation}
+            setLocation={handleLocationChange}
           />
 
           <ProductList products={products} />
@@ -224,10 +289,20 @@ function ShoppingAppMemoProp() {
 
 const MemoisedProductList = memo(ProductList);
 
-function ShoppingAppMemoComponent() {
+function ShoppingAppMemoComponent({
+  setHasChangedLocation,
+}: {
+  setHasChangedLocation: (hasChangedLocation: boolean) => void;
+}) {
   const [location, setLocation] = useState<LocationType>("island_bay");
 
   const products = useMemo(() => PRODUCTS, []);
+
+  const handleLocationChange = (location: LocationType) => {
+    setLocation(location);
+    setHasChangedLocation(true);
+  };
+
   return (
     <RenderTracker name={`ShoppingApp`}>
       <div className="space-y-2 w-full bg-gray-100/80 ">
@@ -240,7 +315,7 @@ function ShoppingAppMemoComponent() {
         <div className="space-y-2 p-4">
           <ShoppingLocationSelector
             location={location}
-            setLocation={setLocation}
+            setLocation={handleLocationChange}
           />
 
           <MemoisedProductList products={products} />
@@ -250,7 +325,11 @@ function ShoppingAppMemoComponent() {
   );
 }
 
-function ShoppingAppMemoPropWithDependency() {
+function ShoppingAppMemoPropWithDependency({
+  setHasChangedLocation,
+}: {
+  setHasChangedLocation: (hasChangedLocation: boolean) => void;
+}) {
   const [location, setLocation] = useState<LocationType>("island_bay");
 
   const suggestedProducts = [
@@ -263,11 +342,17 @@ function ShoppingAppMemoPropWithDependency() {
     },
   ];
 
+  const handleLocationChange = (location: LocationType) => {
+    setLocation(location);
+    setHasChangedLocation(true);
+  };
+
   return (
     <ShoppingAppMemoPropWithDependencyChild
       location={location}
       suggestedProducts={suggestedProducts}
-      setLocation={setLocation}
+      setLocation={handleLocationChange}
+      setHasChangedLocation={setHasChangedLocation}
     />
   );
 }
@@ -276,14 +361,21 @@ function ShoppingAppMemoPropWithDependencyChild({
   location,
   setLocation,
   suggestedProducts,
+  setHasChangedLocation,
 }: {
   location: LocationType;
   setLocation: (location: LocationType) => void;
   suggestedProducts: (typeof PRODUCTS)[number][];
+  setHasChangedLocation: (hasChangedLocation: boolean) => void;
 }) {
   const products = useMemo(() => {
     return [...PRODUCTS, ...suggestedProducts];
   }, [suggestedProducts]);
+
+  const handleLocationChange = (location: LocationType) => {
+    setLocation(location);
+    setHasChangedLocation(true);
+  };
 
   return (
     <RenderTracker name={`ShoppingApp`}>
@@ -297,7 +389,7 @@ function ShoppingAppMemoPropWithDependencyChild({
         <div className="space-y-2 p-4">
           <ShoppingLocationSelector
             location={location}
-            setLocation={setLocation}
+            setLocation={handleLocationChange}
           />
 
           <MemoisedProductList products={products} />
@@ -310,119 +402,168 @@ function ShoppingAppMemoPropWithDependencyChild({
 function StepExplanation({
   step,
   setStep,
+  hasChangedLocation,
 }: {
   step: StepType;
   setStep: (step: StepType) => void;
+  hasChangedLocation: boolean;
 }) {
   switch (step) {
     case "baseline":
       return (
-        <div className="space-y-2 p-4 border rounded-lg bg-red-100 shadow-lg shadow-red-300/20 ring-2 ring-red-300">
-          <h3 className="font-semibold">🚨 Step 1 – Baseline (no memo)</h3>
-          <p className="text-xs text-gray-600">
-            You'll notice every time the pick-up location changes, the
-            ProductList re-renders.
-          </p>
-          <p className="text-xs text-gray-600">
-            When the pick-up location changes, the products array is recreated,
-            so ProductList sees a new products prop and re-renders. Surely,
-            memoising products would prevent those unnecessary re-renders.
-          </p>
-          <p className="text-xs text-gray-600">
-            <strong>Solution:</strong> Let's memoise the products prop.
-          </p>
-          <div className="flex justify-start gap-2">
-            <Button size="sm" onClick={() => setStep("memoiseProp")}>
-              Next
-            </Button>
-          </div>
+        <div
+          className={`space-y-2 p-4 border rounded-lg ${
+            hasChangedLocation
+              ? "bg-red-100 shadow-lg shadow-red-300/20 ring-2 ring-red-300"
+              : "bg-gray-100 shadow-lg shadow-gray-300/20 ring-2 ring-gray-300"
+          }`}
+        >
+          <h3 className="font-semibold">
+            {hasChangedLocation ? "🚨" : ""} Step 1 – Baseline (no memo)
+          </h3>
+          {hasChangedLocation ? (
+            <>
+              <p className="text-xs text-gray-600">
+                You'll notice every time the pick-up location changes, the
+                ProductList re-renders.
+              </p>
+              <p className="text-xs text-gray-600">
+                When the pick-up location changes, the products array is
+                recreated, so ProductList sees a new products prop and
+                re-renders. Surely, memoising products would prevent those
+                unnecessary re-renders.
+              </p>
+              <p className="text-xs text-gray-600">
+                <strong>Solution:</strong> Let's memoise the products prop.
+              </p>
+              <div className="flex justify-start gap-2">
+                <Button size="sm" onClick={() => setStep("memoiseProp")}>
+                  Next
+                </Button>
+              </div>
+            </>
+          ) : null}
         </div>
       );
     case "memoiseProp":
       return (
-        <div className="space-y-2 p-4 border rounded-lg bg-red-100 shadow-lg shadow-red-300/20 ring-2 ring-red-300">
+        <div
+          className={`space-y-2 p-4 border rounded-lg ${
+            hasChangedLocation
+              ? "bg-red-100 shadow-lg shadow-red-300/20 ring-2 ring-red-300"
+              : "bg-gray-100 shadow-lg shadow-gray-300/20 ring-2 ring-gray-300"
+          }`}
+        >
           <h3 className="font-semibold">
-            🚨 Step 2 – Memoise the products prop
+            {hasChangedLocation ? "🚨" : ""} Step 2 – Memoise the products prop
           </h3>
-          <p className="text-xs text-gray-600">
-            You'll notice that the ProductList still re-renders despite us
-            memoising the one prop, products, that it depends on.
-          </p>
-          <p className="text-xs text-gray-600">
-            Why isn't our memoisation working? Well, in order for the
-            memoisation to be effective we have to memoise the component as
-            well.
-          </p>
-          <p className="text-xs text-gray-600">
-            <strong>Solution:</strong> Let's use React.memo to memoise the
-            ProductList component.
-          </p>
+          {hasChangedLocation ? (
+            <>
+              <p className="text-xs text-gray-600">
+                You'll notice that the ProductList still re-renders despite us
+                memoising the one prop, products, that it depends on.
+              </p>
+              <p className="text-xs text-gray-600">
+                Why isn't our memoisation working? Well, in order for the
+                memoisation to be effective we have to memoise the component as
+                well.
+              </p>
+              <p className="text-xs text-gray-600">
+                <strong>Solution:</strong> Let's use React.memo to memoise the
+                ProductList component.
+              </p>
 
-          <div className="flex justify-start gap-2">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setStep("baseline")}
-            >
-              Back
-            </Button>
-            <Button size="sm" onClick={() => setStep("memoiseComponent")}>
-              Next
-            </Button>
-          </div>
+              <div className="flex justify-start gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setStep("baseline")}
+                >
+                  Back
+                </Button>
+                <Button size="sm" onClick={() => setStep("memoiseComponent")}>
+                  Next
+                </Button>
+              </div>
+            </>
+          ) : null}
         </div>
       );
     case "memoiseComponent":
       return (
-        <div className="space-y-2 p-4 border rounded-lg bg-green-100 shadow-lg shadow-green-300/20 ring-2 ring-green-300">
-          <h3 className="font-semibold">✅ Step 3 – Memoise the component</h3>
-          <p className="text-xs text-gray-600">
-            Well, would you look at that! You'll notice that the ProductList no
-            longer re-renders when the pick-up location changes.
-          </p>
-          <p className="text-xs text-gray-600">
-            Finally our memoisation is working. You will notice that we still
-            memoise the products prop passed to the ProductList component.
-          </p>
-          <div className="flex justify-start gap-2">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setStep("memoiseProp")}
-            >
-              Back
-            </Button>
-            <Button
-              size="sm"
-              onClick={() => setStep("memoisePropWithDependency")}
-            >
-              Next
-            </Button>
-          </div>
+        <div
+          className={`space-y-2 p-4 border rounded-lg ${
+            hasChangedLocation
+              ? "bg-green-100 shadow-lg shadow-green-300/20 ring-2 ring-green-300"
+              : "bg-gray-100 shadow-lg shadow-gray-300/20 ring-2 ring-gray-300"
+          }`}
+        >
+          <h3 className="font-semibold">
+            {hasChangedLocation ? "✅" : ""} Step 3 – Memoise the component
+          </h3>
+          {hasChangedLocation ? (
+            <>
+              <p className="text-xs text-gray-600">
+                Well, would you look at that! You'll notice that the ProductList
+                no longer re-renders when the pick-up location changes.
+              </p>
+              <p className="text-xs text-gray-600">
+                Finally our memoisation is working. You will notice that we
+                still memoise the products prop passed to the ProductList
+                component.
+              </p>
+              <div className="flex justify-start gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setStep("memoiseProp")}
+                >
+                  Back
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => setStep("memoisePropWithDependency")}
+                >
+                  Next
+                </Button>
+              </div>
+            </>
+          ) : null}
         </div>
       );
     case "memoisePropWithDependency":
       return (
-        <div className="space-y-2 p-4 border rounded-lg bg-red-100 shadow-lg shadow-red-300/20 ring-2 ring-red-300">
+        <div
+          className={`space-y-2 p-4 border rounded-lg ${
+            hasChangedLocation
+              ? "bg-red-100 shadow-lg shadow-red-300/20 ring-2 ring-red-300"
+              : "bg-gray-100 shadow-lg shadow-gray-300/20 ring-2 ring-gray-300"
+          }`}
+        >
           <h3 className="font-semibold">
-            🚨 Step 4 – Memoise the products prop with a dependency
+            {hasChangedLocation ? "🚨" : ""} Step 4 – Memoise the products prop
+            with a dependency
           </h3>
-          <p className="text-xs text-gray-600">
-            Uh oh, we are back to memoisation not working. And this is our
-            biggest lesson of why memoisation might not be worthwhile.
-          </p>
-          <p className="text-xs text-gray-600">
-            This is because the products prop is not being memoised.
-          </p>
-          <div className="flex justify-start gap-2">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setStep("memoiseComponent")}
-            >
-              Back
-            </Button>
-          </div>
+          {hasChangedLocation ? (
+            <>
+              <p className="text-xs text-gray-600">
+                Uh oh, we are back to memoisation not working. And this is our
+                biggest lesson of why memoisation might not be worthwhile.
+              </p>
+              <p className="text-xs text-gray-600">
+                This is because the products prop is not being memoised.
+              </p>
+              <div className="flex justify-start gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setStep("memoiseComponent")}
+                >
+                  Back
+                </Button>
+              </div>
+            </>
+          ) : null}
         </div>
       );
   }
