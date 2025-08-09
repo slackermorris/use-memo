@@ -8,8 +8,11 @@ import {
   CODE_MEMOISE_COMPONENT,
   CODE_MEMOISE_PROP_WITH_DEPENDENCY,
 } from "./code";
+import { BaselineStepExplanation } from "./broken-memo/Baseline";
+import { MemoisePropStepExplanation } from "./broken-memo/MemoiseProp";
+import { MemoiseComponentStepExplanation } from "./broken-memo/MemoiseComponent";
 
-type StepType =
+export type StepType =
   | "baseline"
   | "memoiseProp"
   | "memoiseComponent"
@@ -410,125 +413,24 @@ function StepExplanation({
   switch (step) {
     case "baseline":
       return (
-        <div
-          className={`space-y-2 p-4 border rounded-lg ${
-            hasChangedLocation
-              ? "bg-red-100 shadow-lg shadow-red-300/20 ring-2 ring-red-300"
-              : "bg-gray-100 shadow-lg shadow-gray-300/20 ring-2 ring-gray-300"
-          }`}
-        >
-          <h3 className="font-semibold">
-            {hasChangedLocation ? "🚨" : ""} Step 1 – Baseline (no memo)
-          </h3>
-          {hasChangedLocation ? (
-            <>
-              <p className="text-xs text-gray-600">
-                You'll notice every time the pick-up location changes, the
-                ProductList re-renders.
-              </p>
-              <p className="text-xs text-gray-600">
-                When the pick-up location changes, the products array is
-                recreated, so ProductList sees a new products prop and
-                re-renders. Surely, memoising products would prevent those
-                unnecessary re-renders.
-              </p>
-              <p className="text-xs text-gray-600">
-                <strong>Solution:</strong> Let's memoise the products prop.
-              </p>
-              <div className="flex justify-start gap-2">
-                <Button size="sm" onClick={() => setStep("memoiseProp")}>
-                  Next
-                </Button>
-              </div>
-            </>
-          ) : null}
-        </div>
+        <BaselineStepExplanation
+          hasChangedLocation={hasChangedLocation}
+          setStep={setStep}
+        />
       );
     case "memoiseProp":
       return (
-        <div
-          className={`space-y-2 p-4 border rounded-lg ${
-            hasChangedLocation
-              ? "bg-red-100 shadow-lg shadow-red-300/20 ring-2 ring-red-300"
-              : "bg-gray-100 shadow-lg shadow-gray-300/20 ring-2 ring-gray-300"
-          }`}
-        >
-          <h3 className="font-semibold">
-            {hasChangedLocation ? "🚨" : ""} Step 2 – Memoise the products prop
-          </h3>
-          {hasChangedLocation ? (
-            <>
-              <p className="text-xs text-gray-600">
-                You'll notice that the ProductList still re-renders despite us
-                memoising the one prop, products, that it depends on.
-              </p>
-              <p className="text-xs text-gray-600">
-                Why isn't our memoisation working? Well, in order for the
-                memoisation to be effective we have to memoise the component as
-                well.
-              </p>
-              <p className="text-xs text-gray-600">
-                <strong>Solution:</strong> Let's use React.memo to memoise the
-                ProductList component.
-              </p>
-
-              <div className="flex justify-start gap-2">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setStep("baseline")}
-                >
-                  Back
-                </Button>
-                <Button size="sm" onClick={() => setStep("memoiseComponent")}>
-                  Next
-                </Button>
-              </div>
-            </>
-          ) : null}
-        </div>
+        <MemoisePropStepExplanation
+          hasChangedLocation={hasChangedLocation}
+          setStep={setStep}
+        />
       );
     case "memoiseComponent":
       return (
-        <div
-          className={`space-y-2 p-4 border rounded-lg ${
-            hasChangedLocation
-              ? "bg-green-100 shadow-lg shadow-green-300/20 ring-2 ring-green-300"
-              : "bg-gray-100 shadow-lg shadow-gray-300/20 ring-2 ring-gray-300"
-          }`}
-        >
-          <h3 className="font-semibold">
-            {hasChangedLocation ? "✅" : ""} Step 3 – Memoise the component
-          </h3>
-          {hasChangedLocation ? (
-            <>
-              <p className="text-xs text-gray-600">
-                Well, would you look at that! You'll notice that the ProductList
-                no longer re-renders when the pick-up location changes.
-              </p>
-              <p className="text-xs text-gray-600">
-                Finally our memoisation is working. You will notice that we
-                still memoise the products prop passed to the ProductList
-                component.
-              </p>
-              <div className="flex justify-start gap-2">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setStep("memoiseProp")}
-                >
-                  Back
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={() => setStep("memoisePropWithDependency")}
-                >
-                  Next
-                </Button>
-              </div>
-            </>
-          ) : null}
-        </div>
+        <MemoiseComponentStepExplanation
+          hasChangedLocation={hasChangedLocation}
+          setStep={setStep}
+        />
       );
     case "memoisePropWithDependency":
       return (
