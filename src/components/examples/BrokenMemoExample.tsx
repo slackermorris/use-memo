@@ -8,6 +8,7 @@ import {
   CODE_MEMOISE_COMPONENT,
   CODE_MEMOISE_PROP_WITH_DEPENDENCY,
 } from "./code";
+import { Card } from "../Card";
 
 type StepType =
   | "baseline"
@@ -55,14 +56,30 @@ export function BrokenMemoExample() {
   const [step, setStep] = useState<StepType>("baseline");
 
   return (
-    <div className="space-y-6">
-      <div className="grid gap-6 lg:grid-cols-2">
-        <div className="space-y-4">
-          <MemoStepButtons step={step} setStep={setStep} />
-          <CodeRenderer step={step} />
+    <div className="space-y-4">
+      <div className="bg-blue-100/80 p-4 rounded-lg border border-blue-300">
+        <div className="text-lg font-semibold">🙋 What is this?!</div>
+        <div className="text-base text-gray-600 space-y-2">
+          <p>
+            Let's explore how memoization works in React, when it helps, and
+            when it doesn't.
+          </p>
+          <p>We'll use a simple shopping app as our example.</p>
+          <p>
+            Follow along, check out the code, and watch how rendering changes as
+            we tweak things.
+          </p>
         </div>
+      </div>
+      <div className="space-y-6">
+        <div className="grid gap-6 lg:grid-cols-2">
+          <div className="space-y-4">
+            <MemoStepButtons step={step} setStep={setStep} />
+            <CodeRenderer step={step} />
+          </div>
 
-        <ShoppingAppRenderer step={step} setStep={setStep} />
+          <ShoppingAppRenderer step={step} setStep={setStep} />
+        </div>
       </div>
     </div>
   );
