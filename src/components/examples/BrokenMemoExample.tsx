@@ -11,6 +11,7 @@ import {
 import { BaselineStepExplanation } from "./broken-memo/Baseline";
 import { MemoisePropStepExplanation } from "./broken-memo/MemoiseProp";
 import { MemoiseComponentStepExplanation } from "./broken-memo/MemoiseComponent";
+import { MemoisePropWithDependencyStepExplanation } from "./broken-memo/MemoisePropWithDependency";
 
 export type StepType =
   | "baseline"
@@ -59,7 +60,7 @@ export function BrokenMemoExample() {
 
   return (
     <div className="space-y-4">
-      <div className="bg-blue-100/80 p-4 rounded-lg border border-blue-300">
+      {/* <div className="bg-blue-100/80 p-4 rounded-lg border border-blue-300">
         <div className="text-lg font-semibold">🙋 What is this?!</div>
         <div className="text-base text-gray-600 space-y-2">
           <p>
@@ -72,7 +73,7 @@ export function BrokenMemoExample() {
             we tweak things.
           </p>
         </div>
-      </div>
+      </div> */}
       <div className="space-y-6">
         <div className="grid gap-6 lg:grid-cols-2">
           <div className="space-y-4">
@@ -434,38 +435,10 @@ function StepExplanation({
       );
     case "memoisePropWithDependency":
       return (
-        <div
-          className={`space-y-2 p-4 border rounded-lg ${
-            hasChangedLocation
-              ? "bg-red-100 shadow-lg shadow-red-300/20 ring-2 ring-red-300"
-              : "bg-gray-100 shadow-lg shadow-gray-300/20 ring-2 ring-gray-300"
-          }`}
-        >
-          <h3 className="font-semibold">
-            {hasChangedLocation ? "🚨" : ""} Step 4 – Memoise the products prop
-            with a dependency
-          </h3>
-          {hasChangedLocation ? (
-            <>
-              <p className="text-xs text-gray-600">
-                Uh oh, we are back to memoisation not working. And this is our
-                biggest lesson of why memoisation might not be worthwhile.
-              </p>
-              <p className="text-xs text-gray-600">
-                This is because the products prop is not being memoised.
-              </p>
-              <div className="flex justify-start gap-2">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setStep("memoiseComponent")}
-                >
-                  Back
-                </Button>
-              </div>
-            </>
-          ) : null}
-        </div>
+        <MemoisePropWithDependencyStepExplanation
+          hasChangedLocation={hasChangedLocation}
+          setStep={setStep}
+        />
       );
   }
   return <div></div>;
