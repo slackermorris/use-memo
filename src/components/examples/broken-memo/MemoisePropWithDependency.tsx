@@ -61,6 +61,9 @@ function MemoisePropWithDependencyStepErrorExplanation({
         >
           Back
         </Button>
+        <Button size="sm" onClick={() => undefined}>
+          Explanation
+        </Button>
       </div>
     </>
   );
