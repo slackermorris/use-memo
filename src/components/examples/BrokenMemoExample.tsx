@@ -8,7 +8,6 @@ import {
   CODE_MEMOISE_COMPONENT,
   CODE_MEMOISE_PROP_WITH_DEPENDENCY,
 } from "./code";
-import { Card } from "../Card";
 
 type StepType =
   | "baseline"
@@ -167,7 +166,7 @@ function ShoppingAppRenderer({
   };
 
   return (
-    <div className="space-y-4 rounded-lg p-1 ring ring-gray-600/20 ring-inset">
+    <div className="space-y-4">
       <StepExplanation
         step={step}
         setStep={handleStepChange}
