@@ -9,6 +9,12 @@ type StepType =
   | "memoiseComponent"
   | "memoisePropWithDependency";
 
+type LocationType =
+  | "island_bay"
+  | "wellington_central"
+  | "wellington_airport"
+  | "wellington_west";
+
 // // Theme context used to demonstrate how Providers can break memoization if value is unstable
 // const ThemeContext = createContext<{ mode: "light" | "dark" }>({
 //   mode: "light",
@@ -17,9 +23,7 @@ type StepType =
 
 const CODE_BASELINE = `
 function ShoppingApp() {
-  const [location, setLocation] = useState<
-    "island_bay" | "wellington_central" | "wellington_airport" | "wellington_west"
-  >("island_bay");
+  const [location, setLocation] = useState<LocationType>("island_bay");
 
   const products = PRODUCTS;
 
@@ -64,9 +68,7 @@ const PRODUCTS = [
 
 const CODE_MEMOISE_PROP = `
 function ShoppingApp() {
-  const [location, setLocation] = useState<
-    "island_bay" | "wellington_central" | "wellington_airport" | "wellington_west"
-  >("island_bay");
+  const [location, setLocation] = useState<LocationType>("island_bay");
 
   const products = useMemo(() => PRODUCTS, []);
 
@@ -89,9 +91,7 @@ const CODE_MEMOISE_COMPONENT = `
 const MemoisedProductList = React.memo(ProductList);
 
 function ShoppingApp() {
-  const [location, setLocation] = useState<
-    "island_bay" | "wellington_central" | "wellington_airport" | "wellington_west"
-  >("island_bay");
+  const [location, setLocation] = useState<LocationType>("island_bay");
 
   const products = useMemo(() => PRODUCTS, []);
 
@@ -114,9 +114,7 @@ const CODE_MEMOISE_PROP_WITH_DEPENDENCY = `
 const MemoisedProductList = React.memo(ProductList);
 
 function ShoppingApp({ suggestedProducts }: { suggestedProducts: (typeof PRODUCTS)[number] }) {
-  const [location, setLocation] = useState<
-    "island_bay" | "wellington_central" | "wellington_airport" | "wellington_west"
-  >("island_bay");
+  const [location, setLocation] = useState<LocationType>("island_bay");
 
   const products = useMemo(() => {
   return [...PRODUCTS, ...suggestedProducts];
@@ -262,7 +260,7 @@ function ShoppingAppRenderer({
       return (
         <div className="space-y-4 rounded-lg p-1 ring ring-gray-600/20 ring-inset">
           <StepExplanation step={step} setStep={setStep} />
-          <ShoppingAppMemoPropWithDependency suggestedProducts={[]} />
+          <ShoppingAppMemoPropWithDependency />
         </div>
       );
   }
@@ -300,12 +298,7 @@ function ShoppingAppNoMemo() {
 }
 
 function ShoppingAppMemoProp() {
-  const [location, setLocation] = useState<
-    | "island_bay"
-    | "wellington_central"
-    | "wellington_airport"
-    | "wellington_west"
-  >("island_bay");
+  const [location, setLocation] = useState<LocationType>("island_bay");
 
   const products = useMemo(() => PRODUCTS, []);
   return (
@@ -333,12 +326,7 @@ function ShoppingAppMemoProp() {
 const MemoisedProductList = memo(ProductList);
 
 function ShoppingAppMemoComponent() {
-  const [location, setLocation] = useState<
-    | "island_bay"
-    | "wellington_central"
-    | "wellington_airport"
-    | "wellington_west"
-  >("island_bay");
+  const [location, setLocation] = useState<LocationType>("island_bay");
 
   const products = useMemo(() => PRODUCTS, []);
   return (
@@ -363,20 +351,37 @@ function ShoppingAppMemoComponent() {
   );
 }
 
-// depends on a prop and it depends on it being referentially stable 
+function ShoppingAppMemoPropWithDependency() {
+  const [location, setLocation] = useState<LocationType>("island_bay");
 
-function ShoppingAppMemoPropWithDependency({
-  suggestedProducts = [],
+  const suggestedProducts = [
+    {
+      id: 1,
+      name: "Product 1",
+      price: 100,
+      category: "electronics",
+      inStock: true,
+    },
+  ];
+
+  return (
+    <ShoppingAppMemoPropWithDependencyChild
+      location={location}
+      suggestedProducts={suggestedProducts}
+      setLocation={setLocation}
+    />
+  );
+}
+
+function ShoppingAppMemoPropWithDependencyChild({
+  location,
+  setLocation,
+  suggestedProducts,
 }: {
+  location: LocationType;
+  setLocation: (location: LocationType) => void;
   suggestedProducts: (typeof PRODUCTS)[number][];
 }) {
-  const [location, setLocation] = useState<
-    | "island_bay"
-    | "wellington_central"
-    | "wellington_airport"
-    | "wellington_west"
-  >("island_bay");
-
   const products = useMemo(() => {
     return [...PRODUCTS, ...suggestedProducts];
   }, [suggestedProducts]);
@@ -413,8 +418,8 @@ function StepExplanation({
   switch (step) {
     case "baseline":
       return (
-        <div className="space-y-2 p-4 border rounded-lg bg-purple-100 shadow-lg shadow-purple-300/20 ring-2 ring-purple-300">
-          <h3 className="font-semibold">Step 1 – Baseline (no memo)</h3>
+        <div className="space-y-2 p-4 border rounded-lg bg-red-100 shadow-lg shadow-red-300/20 ring-2 ring-red-300">
+          <h3 className="font-semibold">🚨 Step 1 – Baseline (no memo)</h3>
           <p className="text-xs text-gray-600">
             You'll notice every time the pick-up location changes, the
             ProductList re-renders.
@@ -434,8 +439,10 @@ function StepExplanation({
       );
     case "memoiseProp":
       return (
-        <div className="space-y-2 p-4 border rounded-lg bg-purple-100 shadow-lg shadow-purple-300/20 ring-2 ring-purple-300">
-          <h3 className="font-semibold">Step 2 – Memoise the products prop</h3>
+        <div className="space-y-2 p-4 border rounded-lg bg-red-100 shadow-lg shadow-red-300/20 ring-2 ring-red-300">
+          <h3 className="font-semibold">
+            🚨 Step 2 – Memoise the products prop
+          </h3>
           <p className="text-xs text-gray-600">
             You'll notice that the ProductList still re-renders despite us
             memoising the one prop, products, that it depends on.
@@ -456,8 +463,8 @@ function StepExplanation({
       );
     case "memoiseComponent":
       return (
-        <div className="space-y-2 p-4 border rounded-lg bg-purple-100 shadow-lg shadow-purple-300/20 ring-2 ring-purple-300">
-          <h3 className="font-semibold">Step 3 – Memoise the component</h3>
+        <div className="space-y-2 p-4 border rounded-lg bg-green-100 shadow-lg shadow-green-300/20 ring-2 ring-green-300">
+          <h3 className="font-semibold">✅ Step 3 – Memoise the component</h3>
           <p className="text-xs text-gray-600">
             Well, would you look at that! You'll notice that the ProductList no
             longer re-renders when the pick-up location changes.
@@ -476,10 +483,17 @@ function StepExplanation({
       );
     case "memoisePropWithDependency":
       return (
-        <div className="space-y-2 p-4 border rounded-lg bg-purple-100 shadow-lg shadow-purple-300/20 ring-2 ring-purple-300">
+        <div className="space-y-2 p-4 border rounded-lg bg-red-100 shadow-lg shadow-red-300/20 ring-2 ring-red-300">
           <h3 className="font-semibold">
-            Step 4 – Memoise the products prop with a dependency
+            🚨 Step 4 – Memoise the products prop with a dependency
           </h3>
+          <p className="text-xs text-gray-600">
+            Uh oh, we are back to memoisation not working. And this is our
+            biggest lesson of why memoisation might not be worthwhile.
+          </p>
+          <p className="text-xs text-gray-600">
+            This is because the products prop is not being memoised.
+          </p>
         </div>
       );
   }
