@@ -1,4 +1,5 @@
-const CODE_BASELINE = `function ShoppingApp() {
+const CODE_BASELINE = `
+function ShoppingApp() {
   const [location, setLocation] = useState<LocationType>("island_bay");
 
   const products = PRODUCTS;
@@ -16,30 +17,6 @@ const CODE_BASELINE = `function ShoppingApp() {
     </>
   );
 };
-  
-const PRODUCTS = [
-  {
-    id: 1,
-    name: "Product 1",
-    price: 100,
-    category: "electronics",
-    inStock: true,
-  },
-  {
-    id: 2,
-    name: "Product 2",
-    price: 200,
-    category: "clothing",
-    inStock: false,
-  },
-  {
-    id: 3,
-    name: "Product 3",
-    price: 300,
-    category: "books",
-    inStock: true,
-  },
-];
 `;
 
 const CODE_MEMOISE_PROP = `
