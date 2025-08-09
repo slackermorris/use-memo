@@ -20,7 +20,7 @@ export function MemoisePropStepExplanation({
       })}
     >
       <h3 className="font-semibold">
-        {hasChangedLocation ? "🚨" : ""} 2️⃣ – Memoise the products prop
+        {hasChangedLocation ? "🚨" : ""} 2️⃣ – Memoise Prop
       </h3>
       {hasChangedLocation ? (
         <MemoisePropStepErrorExplanation setStep={setStep} />

@@ -21,7 +21,7 @@ export function MemoiseComponentStepExplanation({
         })}
       >
         <h3 className="font-semibold">
-          {hasChangedLocation ? "✅" : ""} 3️⃣ – Memoise the component
+          {hasChangedLocation ? "✅" : ""} 3️⃣ – Memoise Component
         </h3>
         {hasChangedLocation ? (
           <MemoiseComponentStepErrorExplanation setStep={setStep} />

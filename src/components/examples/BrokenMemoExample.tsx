@@ -60,20 +60,6 @@ export function BrokenMemoExample() {
 
   return (
     <div className="space-y-4">
-      {/* <div className="bg-blue-100/80 p-4 rounded-lg border border-blue-300">
-        <div className="text-lg font-semibold">🙋 What is this?!</div>
-        <div className="text-base text-gray-600 space-y-2">
-          <p>
-            Let's explore how memoization works in React, when it helps, and
-            when it doesn't.
-          </p>
-          <p>We'll use a simple shopping app as our example.</p>
-          <p>
-            Follow along, check out the code, and watch how rendering changes as
-            we tweak things.
-          </p>
-        </div>
-      </div> */}
       <div className="space-y-6">
         <div className="grid gap-6 lg:grid-cols-2">
           <div className="space-y-4">
@@ -99,11 +85,11 @@ function MemoStepButtons({
     <div className="flex flex-wrap gap-2">
       {[
         { id: "baseline", label: "Baseline" },
-        { id: "memoiseProp", label: "Memoise the products prop" },
-        { id: "memoiseComponent", label: "Memoise the component" },
+        { id: "memoiseProp", label: "Memoise Prop" },
+        { id: "memoiseComponent", label: "Memoise Component" },
         {
           id: "memoisePropWithDependency",
-          label: "Memoise the products prop with a dependency",
+          label: "Memoise Prop with Dependency",
         },
       ].map((s) => (
         <Button
@@ -127,23 +113,20 @@ function CodeRenderer({ step }: { step: StepType }) {
       );
     case "memoiseProp":
       return (
-        <CodeBlock
-          code={CODE_MEMOISE_PROP}
-          title="Step 2 – Memoise the products prop"
-        />
+        <CodeBlock code={CODE_MEMOISE_PROP} title="Step 2 – Memoise Prop" />
       );
     case "memoiseComponent":
       return (
         <CodeBlock
           code={CODE_MEMOISE_COMPONENT}
-          title="Step 3 – Memoise the component"
+          title="Step 3 – Memoise Component"
         />
       );
     case "memoisePropWithDependency":
       return (
         <CodeBlock
           code={CODE_MEMOISE_PROP_WITH_DEPENDENCY}
-          title="Step 4 – Memoise the products prop with a dependency"
+          title="Step 4 – Memoise Prop with Dependency"
         />
       );
   }
