@@ -2,6 +2,12 @@ import { useState, memo, useMemo } from "react";
 import { Button } from "../Button";
 import { RenderTracker } from "../RenderTracker";
 import { CodeBlock } from "../CodeBlock";
+import {
+  CODE_BASELINE,
+  CODE_MEMOISE_PROP,
+  CODE_MEMOISE_COMPONENT,
+  CODE_MEMOISE_PROP_WITH_DEPENDENCY,
+} from "./code";
 
 type StepType =
   | "baseline"
@@ -20,120 +26,6 @@ type LocationType =
 //   mode: "light",
 // });
 // const useTheme = () => useContext(ThemeContext);
-
-const CODE_BASELINE = `
-function ShoppingApp() {
-  const [location, setLocation] = useState<LocationType>("island_bay");
-
-  const products = PRODUCTS;
-
-  return (
-    <>
-      <h3>🛒 Click & Collect Shopping Application</h3>
-      <ShoppingLocationSelector
-        location={location}
-        setLocation={setLocation}
-      />
-      <ProductList
-        products={products}
-      />
-    </>
-  );
-};
-  
-const PRODUCTS = [
-  {
-    id: 1,
-    name: "Product 1",
-    price: 100,
-    category: "electronics",
-    inStock: true,
-  },
-  {
-    id: 2,
-    name: "Product 2",
-    price: 200,
-    category: "clothing",
-    inStock: false,
-  },
-  {
-    id: 3,
-    name: "Product 3",
-    price: 300,
-    category: "books",
-    inStock: true,
-  },
-];
-`;
-
-const CODE_MEMOISE_PROP = `
-function ShoppingApp() {
-  const [location, setLocation] = useState<LocationType>("island_bay");
-
-  const products = useMemo(() => PRODUCTS, []);
-
-  return (
-    <>
-      <h3>🛒 Click & Collect Shopping Application</h3>
-      <ShoppingLocationSelector
-        location={location}
-        setLocation={setLocation}
-      />
-      <ProductList
-        products={products}
-      />
-    </>
-  );
-};
-`;
-
-const CODE_MEMOISE_COMPONENT = `
-const MemoisedProductList = React.memo(ProductList);
-
-function ShoppingApp() {
-  const [location, setLocation] = useState<LocationType>("island_bay");
-
-  const products = useMemo(() => PRODUCTS, []);
-
-  return (
-    <>
-      <h3>🛒 Click & Collect Shopping Application</h3>
-      <ShoppingLocationSelector
-        location={location}
-        setLocation={setLocation}
-      />
-      <MemoisedProductList
-        products={products}
-      />
-    </>
-  );
-};
-`;
-
-const CODE_MEMOISE_PROP_WITH_DEPENDENCY = `
-const MemoisedProductList = React.memo(ProductList);
-
-function ShoppingApp({ suggestedProducts }: { suggestedProducts: (typeof PRODUCTS)[number] }) {
-  const [location, setLocation] = useState<LocationType>("island_bay");
-
-  const products = useMemo(() => {
-  return [...PRODUCTS, ...suggestedProducts];
-  }, [suggestedProducts]);
-
-  return (
-    <>
-      <h3>🛒 Click & Collect Shopping Application</h3>
-      <ShoppingLocationSelector
-        location={location}
-        setLocation={setLocation}
-      />
-      <MemoisedProductList
-        products={products}
-      />
-    </>
-  );
-};
-`;
 
 const PRODUCTS = [
   {
@@ -166,33 +58,43 @@ export function BrokenMemoExample() {
     <div className="space-y-6">
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="space-y-4">
-          <div className="flex flex-wrap gap-2">
-            {[
-              { id: "baseline", label: "Baseline" },
-              { id: "memoiseProp", label: "Memoise the products prop" },
-              { id: "memoiseComponent", label: "Memoise the component" },
-              {
-                id: "memoisePropWithDependency",
-                label: "Memoise the products prop with a dependency",
-              },
-            ].map((s) => (
-              <Button
-                key={s.id}
-                size="sm"
-                variant={
-                  step === (s.id as typeof step) ? "primary" : "secondary"
-                }
-                onClick={() => setStep(s.id as typeof step)}
-              >
-                {s.label}
-              </Button>
-            ))}
-          </div>
+          <MemoStepButtons step={step} setStep={setStep} />
           <CodeRenderer step={step} />
         </div>
 
         <ShoppingAppRenderer step={step} setStep={setStep} />
       </div>
+    </div>
+  );
+}
+
+function MemoStepButtons({
+  step,
+  setStep,
+}: {
+  step: StepType;
+  setStep: (step: StepType) => void;
+}) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {[
+        { id: "baseline", label: "Baseline" },
+        { id: "memoiseProp", label: "Memoise the products prop" },
+        { id: "memoiseComponent", label: "Memoise the component" },
+        {
+          id: "memoisePropWithDependency",
+          label: "Memoise the products prop with a dependency",
+        },
+      ].map((s) => (
+        <Button
+          key={s.id}
+          size="sm"
+          variant={step === (s.id as typeof step) ? "primary" : "secondary"}
+          onClick={() => setStep(s.id as typeof step)}
+        >
+          {s.label}
+        </Button>
+      ))}
     </div>
   );
 }
@@ -234,36 +136,21 @@ function ShoppingAppRenderer({
   step: StepType;
   setStep: (step: StepType) => void;
 }) {
-  switch (step) {
-    case "baseline":
-      return (
-        <div className="space-y-4 rounded-lg p-1 ring ring-gray-600/20 ring-inset">
-          <StepExplanation step={step} setStep={setStep} />
-          <ShoppingAppNoMemo />
-        </div>
-      );
-    case "memoiseProp":
-      return (
-        <div className="space-y-4 rounded-lg p-1 ring ring-gray-600/20 ring-inset">
-          <StepExplanation step={step} setStep={setStep} />
-          <ShoppingAppMemoProp />
-        </div>
-      );
-    case "memoiseComponent":
-      return (
-        <div className="space-y-4 rounded-lg p-1 ring ring-gray-600/20 ring-inset">
-          <StepExplanation step={step} setStep={setStep} />
-          <ShoppingAppMemoComponent />
-        </div>
-      );
-    case "memoisePropWithDependency":
-      return (
-        <div className="space-y-4 rounded-lg p-1 ring ring-gray-600/20 ring-inset">
-          <StepExplanation step={step} setStep={setStep} />
-          <ShoppingAppMemoPropWithDependency />
-        </div>
-      );
-  }
+  return (
+    <div className="space-y-4 rounded-lg p-1 ring ring-gray-600/20 ring-inset">
+      <StepExplanation step={step} setStep={setStep} />
+
+      {step === "baseline" ? (
+        <ShoppingAppNoMemo />
+      ) : step === "memoiseProp" ? (
+        <ShoppingAppMemoProp />
+      ) : step === "memoiseComponent" ? (
+        <ShoppingAppMemoComponent />
+      ) : step === "memoisePropWithDependency" ? (
+        <ShoppingAppMemoPropWithDependency />
+      ) : null}
+    </div>
+  );
 }
 
 function ShoppingAppNoMemo() {
