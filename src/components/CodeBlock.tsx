@@ -22,7 +22,7 @@ export function CodeBlock({
       try {
         const highlighted = await codeToHtml(code, {
           lang: language,
-          theme: "github-light",
+          theme: "github-dark",
         });
         setHtml(highlighted);
       } catch (error) {

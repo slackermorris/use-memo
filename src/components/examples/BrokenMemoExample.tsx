@@ -154,12 +154,7 @@ function ShoppingAppRenderer({
 }
 
 function ShoppingAppNoMemo() {
-  const [location, setLocation] = useState<
-    | "island_bay"
-    | "wellington_central"
-    | "wellington_airport"
-    | "wellington_west"
-  >("island_bay");
+  const [location, setLocation] = useState<LocationType>("island_bay");
 
   const products = PRODUCTS;
   return (
@@ -319,9 +314,11 @@ function StepExplanation({
           <p className="text-xs text-gray-600">
             <strong>Solution:</strong> Let's memoise the products prop.
           </p>
-          <Button size="sm" onClick={() => setStep("memoiseProp")}>
-            Next
-          </Button>
+          <div className="flex justify-start gap-2">
+            <Button size="sm" onClick={() => setStep("memoiseProp")}>
+              Next
+            </Button>
+          </div>
         </div>
       );
     case "memoiseProp":
@@ -343,9 +340,19 @@ function StepExplanation({
             <strong>Solution:</strong> Let's use React.memo to memoise the
             ProductList component.
           </p>
-          <Button size="sm" onClick={() => setStep("memoiseComponent")}>
-            Next
-          </Button>
+
+          <div className="flex justify-start gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setStep("baseline")}
+            >
+              Back
+            </Button>
+            <Button size="sm" onClick={() => setStep("memoiseComponent")}>
+              Next
+            </Button>
+          </div>
         </div>
       );
     case "memoiseComponent":
@@ -360,12 +367,21 @@ function StepExplanation({
             Finally our memoisation is working. You will notice that we still
             memoise the products prop passed to the ProductList component.
           </p>
-          <Button
-            size="sm"
-            onClick={() => setStep("memoisePropWithDependency")}
-          >
-            Next
-          </Button>
+          <div className="flex justify-start gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setStep("memoiseProp")}
+            >
+              Back
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => setStep("memoisePropWithDependency")}
+            >
+              Next
+            </Button>
+          </div>
         </div>
       );
     case "memoisePropWithDependency":
@@ -381,6 +397,15 @@ function StepExplanation({
           <p className="text-xs text-gray-600">
             This is because the products prop is not being memoised.
           </p>
+          <div className="flex justify-start gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setStep("memoiseComponent")}
+            >
+              Back
+            </Button>
+          </div>
         </div>
       );
   }
