@@ -3,7 +3,11 @@ import { Button } from "../Button";
 import { RenderTracker } from "../RenderTracker";
 import { CodeBlock } from "../CodeBlock";
 
-type StepType = "baseline" | "memoiseProp" | "memoiseComponent";
+type StepType =
+  | "baseline"
+  | "memoiseProp"
+  | "memoiseComponent"
+  | "memoisePropWithDependency";
 
 // // Theme context used to demonstrate how Providers can break memoization if value is unstable
 // const ThemeContext = createContext<{ mode: "light" | "dark" }>({
@@ -106,6 +110,33 @@ function ShoppingApp() {
 };
 `;
 
+const CODE_MEMOISE_PROP_WITH_DEPENDENCY = `
+const MemoisedProductList = React.memo(ProductList);
+
+function ShoppingApp({ suggestedProducts }: { suggestedProducts: (typeof PRODUCTS)[number] }) {
+  const [location, setLocation] = useState<
+    "island_bay" | "wellington_central" | "wellington_airport" | "wellington_west"
+  >("island_bay");
+
+  const products = useMemo(() => {
+  return [...PRODUCTS, ...suggestedProducts];
+  }, [suggestedProducts]);
+
+  return (
+    <>
+      <h3>🛒 Click & Collect Shopping Application</h3>
+      <ShoppingLocationSelector
+        location={location}
+        setLocation={setLocation}
+      />
+      <MemoisedProductList
+        products={products}
+      />
+    </>
+  );
+};
+`;
+
 const PRODUCTS = [
   {
     id: 1,
@@ -142,6 +173,10 @@ export function BrokenMemoExample() {
               { id: "baseline", label: "Baseline" },
               { id: "memoiseProp", label: "Memoise the products prop" },
               { id: "memoiseComponent", label: "Memoise the component" },
+              {
+                id: "memoisePropWithDependency",
+                label: "Memoise the products prop with a dependency",
+              },
             ].map((s) => (
               <Button
                 key={s.id}
@@ -184,6 +219,13 @@ function CodeRenderer({ step }: { step: StepType }) {
           title="Step 3 – Memoise the component"
         />
       );
+    case "memoisePropWithDependency":
+      return (
+        <CodeBlock
+          code={CODE_MEMOISE_PROP_WITH_DEPENDENCY}
+          title="Step 4 – Memoise the products prop with a dependency"
+        />
+      );
   }
 }
 
@@ -214,6 +256,13 @@ function ShoppingAppRenderer({
         <div className="space-y-4 rounded-lg p-1 ring ring-gray-600/20 ring-inset">
           <StepExplanation step={step} setStep={setStep} />
           <ShoppingAppMemoComponent />
+        </div>
+      );
+    case "memoisePropWithDependency":
+      return (
+        <div className="space-y-4 rounded-lg p-1 ring ring-gray-600/20 ring-inset">
+          <StepExplanation step={step} setStep={setStep} />
+          <ShoppingAppMemoPropWithDependency suggestedProducts={[]} />
         </div>
       );
   }
@@ -314,6 +363,46 @@ function ShoppingAppMemoComponent() {
   );
 }
 
+// depends on a prop and it depends on it being referentially stable 
+
+function ShoppingAppMemoPropWithDependency({
+  suggestedProducts = [],
+}: {
+  suggestedProducts: (typeof PRODUCTS)[number][];
+}) {
+  const [location, setLocation] = useState<
+    | "island_bay"
+    | "wellington_central"
+    | "wellington_airport"
+    | "wellington_west"
+  >("island_bay");
+
+  const products = useMemo(() => {
+    return [...PRODUCTS, ...suggestedProducts];
+  }, [suggestedProducts]);
+
+  return (
+    <RenderTracker name={`ShoppingApp`}>
+      <div className="space-y-2 w-full bg-gray-100/80 ">
+        <div className="flex items-center justify-between w-full p-4 bg-gray-200">
+          <h3 className="text-lg font-semibold">
+            🛒 Click & Collect Shopping Application
+          </h3>
+        </div>
+
+        <div className="space-y-2 p-4">
+          <ShoppingLocationSelector
+            location={location}
+            setLocation={setLocation}
+          />
+
+          <MemoisedProductList products={products} />
+        </div>
+      </div>
+    </RenderTracker>
+  );
+}
+
 function StepExplanation({
   step,
   setStep,
@@ -377,13 +466,27 @@ function StepExplanation({
             Finally our memoisation is working. You will notice that we still
             memoise the products prop passed to the ProductList component.
           </p>
+          <Button
+            size="sm"
+            onClick={() => setStep("memoisePropWithDependency")}
+          >
+            Next
+          </Button>
+        </div>
+      );
+    case "memoisePropWithDependency":
+      return (
+        <div className="space-y-2 p-4 border rounded-lg bg-purple-100 shadow-lg shadow-purple-300/20 ring-2 ring-purple-300">
+          <h3 className="font-semibold">
+            Step 4 – Memoise the products prop with a dependency
+          </h3>
         </div>
       );
   }
   return <div></div>;
 }
 
-function ProductList({ products }: { products: Product[] }) {
+function ProductList({ products }: { products: (typeof PRODUCTS)[0][] }) {
   return (
     <RenderTracker
       name={`ProductList`}
