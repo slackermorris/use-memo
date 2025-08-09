@@ -59,7 +59,7 @@ export function CodeBlock({
         </div>
       )}
       <div
-        className="text-sm w-full overflow-x-scroll"
+        className=""
         dangerouslySetInnerHTML={{ __html: html }}
       />
     </div>
