@@ -62,7 +62,13 @@ function MemoisePropWithDependencyStepErrorExplanation({
           Back
         </Button>
         <Button size="sm" onClick={() => undefined}>
-          Explanation
+          <a
+            href="https://kwicherbelliaken.studio/posts/why-react-memo-does-not-work/"
+            target="_blank"
+            className="hover:underline"
+          >
+            Explanation
+          </a>
         </Button>
       </div>
     </>
